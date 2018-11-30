@@ -5,6 +5,10 @@ const {app, BrowserWindow} = require('electron')
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
 
+// Set ENV
+// Comment out the next line for development mode
+process.env.NODE_ENV = 'production';
+
 function createWindow () {
   // Create the browser window.
   mainWindow = new BrowserWindow({width: 1200, height: 1000})
@@ -42,3 +46,42 @@ app.on('activate', function () {
     createWindow()
   }
 })
+
+const mainMenuTemplate = [
+    {
+        label: 'File',
+        submenu: [
+            {
+                label: 'Quit',
+                accelerator: process.platform == 'darwin' ? 'Command+Q' : 'Ctrl+Q' ,
+                click(){
+                    app.quit();
+                }
+            }
+        ]
+    }
+]
+
+// If OSX, add empty object to menu
+if(process.platform == 'darwin'){
+  mainMenuTemplate.unshift({});
+}
+
+// Add developer tools option if in dev
+if(process.env.NODE_ENV !== 'production'){
+  mainMenuTemplate.push({
+    label: 'Developer Tools',
+    submenu:[
+      {
+        role: 'reload'
+      },
+      {
+        label: 'Toggle DevTools',
+        accelerator:process.platform == 'darwin' ? 'Command+I' : 'Ctrl+I',
+        click(item, focusedWindow){
+          focusedWindow.toggleDevTools();
+        }
+      }
+    ]
+  });
+}
